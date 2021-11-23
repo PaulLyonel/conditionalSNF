@@ -273,7 +273,7 @@ def langevin_step(x, stepsize, energy, lang_steps):
             grad_x,e_x=energy_grad(x,energy)
             if i==0:
                 energy_x=e_x
-            y = x - stepsize * grad_x + np.sqrt(2*stepsize/beta) * w
+            y = x - stepsize * grad_x + np.sqrt(2*stepsize/beta) * eta
             grad_y,energy_y=energy_grad(y, energy)
 
             eta_ = (x - y + stepsize* grad_y) / np.sqrt(2*stepsize/beta)
