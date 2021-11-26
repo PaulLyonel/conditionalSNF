@@ -31,14 +31,14 @@ num_epochs_INN = 4000
 DIMENSION=100
 
 # train from scratch or just use pretrained model
-retrain=False
+retrain=True
 
 # trains and evaluates both the INN and SNF and returns the Wasserstein distance on the mixture example
-# parameters are the mixture params (parameters of the mixture model in the prior), b (likelihood parameter), conv_comb_factor (use ML or KL loss)
+# parameters are the mixture params (parameters of the mixture model in the prior), b (likelihood parameter)
 # a set of testing_ys and the forward model (forward_map)
 #
 # prints and returns the Wasserstein distance of SNF/INN
-def train_and_eval(mixture_params, b, convex_comb_factor, testing_ys, forward_map):
+def train_and_eval(mixture_params, b, testing_ys, forward_map):
 
     forward_model=lambda x: forward_pass(x, forward_map)
     log_posterior=lambda samples,y:get_log_posterior(samples,forward_map,mixture_params,b,y)
@@ -50,8 +50,8 @@ def train_and_eval(mixture_params, b, convex_comb_factor, testing_ys, forward_ma
         prog_bar = tqdm(total=num_epochs_SNF)
         for i in range(num_epochs_SNF):
             data_loader = get_epoch_data_loader(mixture_params, num_samples_per_epoch, batch_size, forward_map, b)
-            loss = train_SNF_epoch(optimizer, snf, data_loader, forward_model,0.,b,lambda samples: get_prior_log_likelihood(samples, mixture_params), convex_comb_factor=convex_comb_factor)
-            prog_bar.set_description('Convex comb: {}, loss: {:.4f}, b: {}, n_mix: {}'.format(convex_comb_factor, loss, b, len(mixture_params)))
+            loss = train_SNF_epoch(optimizer, snf, data_loader, forward_model,0.,b,lambda samples: get_prior_log_likelihood(samples, mixture_params))
+            prog_bar.set_description('loss: {:.4f}, b: {}, n_mix: {}'.format(loss, b, len(mixture_params)))
             prog_bar.update()
         prog_bar.close()
 
@@ -62,7 +62,7 @@ def train_and_eval(mixture_params, b, convex_comb_factor, testing_ys, forward_ma
         for i in range(num_epochs_INN):
             data_loader = get_epoch_data_loader(mixture_params, num_samples_per_epoch, batch_size, forward_map, b)
             loss = train_inn_epoch(optimizer_inn, INN, data_loader)
-            prog_bar.set_description('INN Convex comb: {}, loss: {:.4f}, b: {}, n_mix: {}'.format(convex_comb_factor, loss, b, len(mixture_params)))
+            prog_bar.set_description('loss: {:.4f}, b: {}, n_mix: {}'.format(loss, b, len(mixture_params)))
             prog_bar.update()
         prog_bar.close()
         if not os.path.isdir('models_mixture'):
@@ -95,8 +95,8 @@ def train_and_eval(mixture_params, b, convex_comb_factor, testing_ys, forward_ma
         inp_samps=torch.randn(testing_x_per_y, DIMENSION, device=device)
         samples1 = snf.forward(inp_samps, inflated_ys)[0].detach().cpu().numpy()
         samples_INN = INN(inp_samps, c = inflated_ys)[0].detach().cpu().numpy()
-        make_image(true_posterior_samples, samples1, 'SNF_mixtures{}_b{}_convexcomb{:.2f}_{}.png'.format(len(mixture_params), b, convex_comb_factor,i),directory='Images',inds=[0,49,99])
-        make_image(true_posterior_samples, samples_INN, 'INN_mixtures{}_b{}_convexcomb{:.2f}_{}.png'.format(len(mixture_params), b, convex_comb_factor,i),directory='Images',inds=[0,49,99])
+        make_image(true_posterior_samples, samples1, 'SNF_mixtures{}_b{}_{}.png'.format(len(mixture_params), b,i),directory='Images',inds=[0,49,99])
+        make_image(true_posterior_samples, samples_INN, 'INN_mixtures{}_b{}_{}.png'.format(len(mixture_params), b,i),directory='Images',inds=[0,49,99])
 
         M1 =ot.dist(samples1, true_posterior_samples, metric='euclidean')
         M2 =ot.dist(samples_INN, true_posterior_samples, metric='euclidean')
@@ -141,7 +141,7 @@ for i in range(n_mixtures):
 testing_xs = draw_mixture_dist(mixture_params, testing_num_y)
 testing_ys = forward_pass(testing_xs, forward_map) + b * torch.randn(testing_num_y, DIMENSION, device=device)
 
-train_and_eval(mixture_params,b,0.,testing_ys,forward_map)
+train_and_eval(mixture_params,b,testing_ys,forward_map)
 
 
 

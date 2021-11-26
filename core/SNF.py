@@ -301,7 +301,7 @@ def train_SNF_epoch(optimizer, snf, epoch_data_loader,forward_model,a,b,get_prio
         jac_inv = out[1]
 
         l5 = 0.5* torch.sum(invs**2, dim=1) - jac_inv
-        loss += (torch.sum(l5) / cur_batch_size * (1-convex_comb_factor))
+        loss += torch.sum(l5) / cur_batch_size 
         mean_loss = mean_loss * k / (k + 1) + loss.data.item() / (k + 1)
         optimizer.zero_grad()
         loss.backward()
