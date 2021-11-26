@@ -30,7 +30,7 @@ def create_INN(num_layers, sub_net_size,dimension=5,dimension_condition=5):
 
 # trains an epoch of the INN
 # given optimizer, the model and the data_loader
-# training is done via maximum likelihood loss (conv_comb = 0 in SNF language)
+# training is done via maximum likelihood loss
 # returns mean loss
 
 def train_inn_epoch(optimizer, model, epoch_data_loader):
