@@ -34,7 +34,7 @@ lambd_bd = 1000
 a = 0.2
 b = 0.01
 relu = torch.nn.ReLU()
-retrain=True
+retrain = False
 # regularization parameter for KL calculation
 reg=1e-10
 
@@ -89,7 +89,7 @@ def train_and_eval(a, b, testing_ys, forward_model):
         INN.load_state_dict(torch.load('models_scatterometry/inn.pt'))
 
     # parameters for testing
-    testing_x_per_y = 16000
+    testing_x_per_y = int(16000*(1.5)**3)
 
     testing_num_y = len(testing_ys)
     weights1, weights2 = np.ones((testing_x_per_y,)) / testing_x_per_y, np.ones((testing_x_per_y,)) / testing_x_per_y
@@ -98,7 +98,7 @@ def train_and_eval(a, b, testing_ys, forward_model):
     kl2_sum = 0.
     kl1_vals=[]
     kl2_vals=[]
-    nbins=50
+    nbins=75
     repeats=10
     tic=time.time()
     for i, y in enumerate(testing_ys):
@@ -122,8 +122,8 @@ def train_and_eval(a, b, testing_ys, forward_model):
             hist_snf_sum+=hist_snf
             hist_inn_sum+=hist_inn
         # save histograms
-        make_image(true_posterior_samples,samples1, 'SNF_img'+str(i),'Images_comp')
-        make_image(true_posterior_samples,samples2, 'INN_img'+str(i),'Images_comp')
+        #make_image(true_posterior_samples,samples1, 'SNF_img'+str(i),'Images_comp')
+        #make_image(true_posterior_samples,samples2, 'INN_img'+str(i),'Images_comp')
 
         hist_mcmc = hist_mcmc_sum/hist_mcmc_sum.sum()
         hist_snf = hist_snf_sum/hist_snf_sum.sum()
@@ -157,8 +157,8 @@ def train_and_eval(a, b, testing_ys, forward_model):
     return (kl1_sum / testing_num_y, kl2_sum/testing_num_y)
 
 # define seed and call methods
-torch.manual_seed(22)
-np.random.seed(32)
+np.random.seed(0)
+torch.manual_seed(0)
 # creating ys for evaluating the model
 testing_num_y = 100
 testing_xs = torch.rand(testing_num_y, 3, device = device)*2-1

@@ -43,6 +43,23 @@ def create_snf(num_layers, sub_net_size,log_posterior,metr_steps_per_block=3,dim
                 snf.add_layer(MCMC_layer(log_posterior,lambd,noise_std,metr_steps_per_block))
 
     return snf
+
+
+def create_snf_last_layer(num_layers, sub_net_size,log_posterior,metr_steps_per_block=3,dimension_condition=5,dimension=5,noise_std=0.4,num_inn_layers=1,
+                 lang_steps = 0,lang_steps_prop=1, step_size = 5e-3, langevin_prop = False):
+    snf=SNF()
+    for k in range(num_layers):
+        lambd = (k+1)/(num_layers)
+        snf.add_layer(deterministic_layer(num_inn_layers,sub_net_size,dimension_condition=dimension_condition,dimension=dimension))
+    if metr_steps_per_block>0:
+        if lang_steps>0:
+            snf.add_layer(Langevin_layer(log_posterior,lambd,lang_steps,step_size))
+        if langevin_prop:
+            snf.add_layer(MALA_layer(log_posterior,lambd,metr_steps_per_block,lang_steps_prop,step_size))
+        else:
+            snf.add_layer(MCMC_layer(log_posterior,lambd,noise_std,metr_steps_per_block))
+
+    return snf
 # defines a fully connected subnetwork with input size c_in, output size c_out and hidden sizes sub_net_size
 def subnet_fc(c_in, c_out,sub_net_size):
     return nn.Sequential(nn.Linear(c_in, sub_net_size), nn.ReLU(),
@@ -56,7 +73,7 @@ class SNF(nn.Module):
     # initialize SNF
     def __init__(self,layers=[]):
         super(SNF, self).__init__()
-        self.layers=layers
+        self.layers=[]
         self.param_counter=0
         
     # adds layer and registers parameters
@@ -216,7 +233,7 @@ def get_interpolated_energy_fun(ys,lambd,get_log_posterior):
 def energy_grad(x, energy):
     x = x.requires_grad_(True)
     e = energy(x)
-    return torch.autograd.grad(e.sum(), x,retain_graph=True)[0],e
+    return torch.autograd.grad(e.sum(), x,create_graph=True)[0],e
 
 # anneals to energy
 #
