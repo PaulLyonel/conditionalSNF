@@ -1,8 +1,8 @@
 # This code belongs to the paper
 #
-# P. Hagemann, J. Hertrich, G. Steidl (2021).
+# P. Hagemann, J. Hertrich, G. Steidl (2022).
 # Stochastic Normalizing Flows for Inverse Problems: a Markov Chains Viewpoint
-# Arxiv preprint arXiv:2109.11375
+# SIAM/ASA Journal on Uncertainty Quantification, vol. 10 (3), pp. 1162-1190.
 #
 # Please cite the paper, if you use this code.
 # This script reproduces the numerical example from Section 7.2 of the paper.

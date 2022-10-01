@@ -1,6 +1,7 @@
 # Stochastic Normalizing Flows for Inverse Problems: a Markov Chains Viewpoint
 
-This is the code belonging to the research paper "Stochastic Normalizing Flows for Inverse Problems: a Markov Chains Viewpoint" [1] available at https://arxiv.org/abs/2109.11375.  If you find this code useful for your research, please cite the paper.  
+This is the code belonging to the research paper "Stochastic Normalizing Flows for Inverse Problems: a Markov Chains Viewpoint" [1] available at https://doi.org/10.1137/21M1450604.
+An preprint is available at https://arxiv.org/abs/2109.11375.  If you find this code useful for your research, please cite the paper.  
 
 The repository implements conditional stochastic normalizing flows (SNFs) as introduced in [1]. Conditional SNFs extend the model of SNFs [4] for inverse problems.  
 
@@ -36,7 +37,7 @@ The directory `core` contains the INN and SNF model. The directory `utils` conta
 
 [1] P. Hagemann, J. Hertrich and G. Steidl.  
 Stochastic Normalizing Flows for Inverse Problems: a Markov Chains Viewpoint.  
-ArXiv preprint arXiv:2109.11375, 2021.  
+SIAM/ASA Journal on Uncertainty Quantification, vol. 10 (3), pp. 1162-1190, 2022.  
 
 [2] S. Heidenreich, H. Gross, and M. Bär.  
 Bayesian approach to the statistical inverse problem of scatterometry: Comparison of three surrogate models.  
